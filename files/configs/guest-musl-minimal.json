@@ -1,0 +1,84 @@
+{
+	"name": "guest-musl-minimal",
+	"setting": {
+		"rootfs": {
+			"path": "/lxc/guests/guest-musl-minimal"
+		},
+		"lifecycle": {
+			"halt": "SIGRTMIN+2",
+			"reboot": "SIGTERM"
+		},
+		"cap": {
+			"drop": "sys_module mac_admin mac_override sys_time",
+			"keep": ""
+		}
+	},
+	"resource": [
+		{
+			"type":		"cgroup",
+			"object":	"cpuset.cpus",
+			"value":	"2-4"
+		}
+	],
+	"mount": [
+		{
+			"type": 	"auto",
+			"param": 	"cgroup:mixed proc:mixed sys:mixed"
+		},
+		{
+			"type": 	"filesystem",
+			"from": 	"shm",
+			"to":		"/dev/shm",
+			"fstype":	"tmpfs",
+			"option": 	"defaults 0 0"
+		},
+		{
+			"type": 	"directry",
+			"from": 	"/sys/kernel/security",
+			"to":		"sys/kernel/security",
+			"fstype":	"none",
+			"option": 	"ro,bind,optional 0 0"
+		},
+		{
+			"type": 	"directry",
+			"from": 	"/lxc/share",
+			"to":		"lxc/share",
+			"fstype":	"none",
+			"option": 	"bind,optional,create=dir"
+		}
+	],
+	"network": [
+		{
+			"type": 	"veth",
+			"link": 	"lxcbr0",
+			"flags":	"up",
+			"hwaddr":	"00:16:3e:xx:xx:xx",
+			"veth": {
+				"mode": "bridge"
+			},
+			"ipv4": {
+				"address":	"10.0.3.50/24",
+				"gateway":	"10.0.3.1"
+			},
+			"ipv6": {
+			}
+		},
+		{
+			"type": 	"can",
+			"flags":	"up",
+			"can": {
+				"hostdev" : "guest4",
+				"rules": {
+					"receive": [
+						"-e"
+					],
+					"send": [
+						"-e"
+					]
+				}
+			}
+		}
+
+	],
+	"autoboot": true
+}
